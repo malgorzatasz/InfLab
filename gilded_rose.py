@@ -1,5 +1,26 @@
 # -*- coding: utf-8 -*-
 
+def quality_positive_value(item):
+    return item.quality>0
+
+def quality_value_below_max(item):
+    return item.quality <50
+
+def quality_decrease(item):
+    return item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert"
+
+def quality_decrease_twice(item):
+    return "Conjured " in item.name and quality_positive_value(item)
+
+def name_backstage_passes(item):
+    return "Backstage passes" in item.name
+
+def can_be_bought(item):
+    return item.name != "Sulfuras, Hand of Ragnaros"
+
+def overdue_item(item):
+    return item.sell_in < 0
+
 class GildedRose(object):
 
     def __init__(self, items):
@@ -7,36 +28,33 @@ class GildedRose(object):
 
     def update_quality(self):
         for item in self.items:
-            if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert":
-                if item.quality > 0:
-                    if item.name != "Sulfuras, Hand of Ragnaros":
-                        item.quality = item.quality - 1
-                        if "Conjured " in item.name and item.quality>0:
-                            item.quality=item.quality-1
+            if quality_decrease(item):
+                if can_be_bought(item) and quality_positive_value(item):
+                    item.quality = item.quality - 1
+                    if quality_decrease_twice(item):
+                        item.quality=item.quality-1
             else: 
-                if item.quality < 50:
+                if quality_value_below_max(item):
                     item.quality = item.quality + 1
-                    if item.name == "Backstage passes to a TAFKAL80ETC concert":
+                    if name_backstage_passes(item):
                         if item.sell_in < 11:
-                            if item.quality < 50:
+                            if quality_value_below_max(item):
                                 item.quality = item.quality + 1
                         if item.sell_in < 6:
-                            if item.quality < 50:
+                            if quality_value_below_max(item):
                                 item.quality = item.quality + 1
-            if item.name != "Sulfuras, Hand of Ragnaros":
+            if can_be_bought(item):
                 item.sell_in = item.sell_in - 1 
-            if item.sell_in < 0: 
-                if item.name != "Aged Brie":
-                    if item.name != "Backstage passes to a TAFKAL80ETC concert":
-                        if item.quality > 0:
-                            if item.name != "Sulfuras, Hand of Ragnaros":
-                                item.quality = item.quality - 1
-                                if "Conjured " in item.name and item.quality>0:
-                                    item.quality=item.quality-1
-                    else: 
-                        item.quality = item.quality - item.quality
+            if overdue_item(item): 
+                if quality_decrease(item):
+                    if can_be_bought(item) and quality_positive_value(item):
+                        item.quality = item.quality - 1
+                        if quality_decrease_twice(item):
+                            item.quality=item.quality-1
+                elif name_backstage_passes(item): 
+                    item.quality = item.quality - item.quality
                 else: 
-                    if item.quality < 50:
+                    if quality_value_below_max(item):
                         item.quality = item.quality + 1
 
 
