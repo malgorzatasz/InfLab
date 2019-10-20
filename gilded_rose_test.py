@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#source "https://github.com/emilybache/GildedRose-Refactoring-Kata/blob/master/python/test_gilded_rose.py"
 from __future__ import print_function
 
 from gilded_rose import *
