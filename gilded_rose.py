@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#refactored code from source "https://github.com/emilybache/GildedRose-Refactoring-Kata/blob/master/python/gilded_rose.py"
 
 def quality_positive_value(item):
     return item.quality>0
