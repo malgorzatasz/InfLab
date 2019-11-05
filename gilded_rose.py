@@ -2,25 +2,41 @@
 #refactored code from source "https://github.com/emilybache/GildedRose-Refactoring-Kata/blob/master/python/gilded_rose.py"
 
 def quality_positive_value(item):
-    return item.quality>0
+    return item.quality > 0
 
-def quality_value_below_max(item):
-    return item.quality <50
+def quality_max_value(item):
+    return item.quality < 50
 
-def quality_decrease(item):
-    return item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert"
+def overdue_item(item):
+    return item.sell_in < 0
 
-def quality_decrease_twice(item):
-    return "Conjured " in item.name and quality_positive_value(item)
+def decrease_quality_value(item):
+    if quality_positive_value(item):
+        item.quality -= 1
 
-def name_backstage_passes(item):
-    return "Backstage passes" in item.name
+def increase_quality_value(item):
+    if quality_max_value(item):
+        item.quality += 1
 
 def can_be_bought(item):
     return item.name != "Sulfuras, Hand of Ragnaros"
 
-def overdue_item(item):
-    return item.sell_in < 0
+def item_quality_decrease_twice(item):
+    if "Conjured " in item.name:
+        decrease_quality_value(item)
+
+def item_quality_decrease(item):
+    return item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert"
+    
+def item_backstage_passes(item):
+    if item.name == "Backstage passes to a TAFKAL80ETC concert":
+        if item.sell_in < 11:
+            increase_quality_value(item)
+        if item.sell_in < 6:
+            increase_quality_value(item)
+        if overdue_item(item):
+            item.quality = item.quality - item.quality
+    return item.quality
 
 class GildedRose(object):
 
@@ -29,34 +45,24 @@ class GildedRose(object):
 
     def update_quality(self):
         for item in self.items:
-            if quality_decrease(item):
-                if can_be_bought(item) and quality_positive_value(item):
-                    item.quality = item.quality - 1
-                    if quality_decrease_twice(item):
-                        item.quality=item.quality-1
+            if item_quality_decrease(item):
+                if can_be_bought(item):
+                    decrease_quality_value(item)
+                    item_quality_decrease_twice(item)
             else: 
-                if quality_value_below_max(item):
-                    item.quality = item.quality + 1
-                    if name_backstage_passes(item):
-                        if item.sell_in < 11:
-                            if quality_value_below_max(item):
-                                item.quality = item.quality + 1
-                        if item.sell_in < 6:
-                            if quality_value_below_max(item):
-                                item.quality = item.quality + 1
+                increase_quality_value(item)
+                item_backstage_passes(item)
+
             if can_be_bought(item):
                 item.sell_in = item.sell_in - 1 
             if overdue_item(item): 
-                if quality_decrease(item):
-                    if can_be_bought(item) and quality_positive_value(item):
-                        item.quality = item.quality - 1
-                        if quality_decrease_twice(item):
-                            item.quality=item.quality-1
-                elif name_backstage_passes(item): 
-                    item.quality = item.quality - item.quality
+                if item_quality_decrease(item):
+                    if can_be_bought(item):
+                        decrease_quality_value(item)
+                        item_quality_decrease_twice(item)
                 else: 
-                    if quality_value_below_max(item):
-                        item.quality = item.quality + 1
+                    increase_quality_value(item)
+                    item_backstage_passes(item)
 
 
 class Item:
